@@ -1,0 +1,50 @@
+---
+import FluidLab from './FluidLab.astro';
+---
+<div class="fluid-experience">
+  <div class="experiment-heading"><div><p class="eyebrow">TRY THE MODEL</p><p>亲手调整参数，观察流动怎样变化。</p></div><button id="expand-fluid" class="button" aria-haspopup="dialog" aria-controls="fluid-dialog" hidden>放大实验 ↗</button></div>
+  <div id="fluid-inline"><FluidLab /></div>
+  <dialog id="fluid-dialog" aria-labelledby="fluid-dialog-title">
+    <div class="dialog-heading"><div><p class="eyebrow">THE FLUID LAB</p><h2 id="fluid-dialog-title">计算流体力学实验</h2></div><button id="close-fluid" class="button" aria-label="关闭放大实验" autofocus>关闭 ×</button></div>
+    <div id="fluid-expanded"></div>
+  </dialog>
+</div>
+<script>
+  import '../scripts/fluid-init';
+  const dialog = document.querySelector<HTMLDialogElement>('#fluid-dialog')!;
+  const inline = document.querySelector<HTMLElement>('#fluid-inline')!;
+  const expanded = document.querySelector<HTMLElement>('#fluid-expanded')!;
+  const lab = inline.querySelector<HTMLElement>('.lbm-lab')!;
+  const open = document.querySelector<HTMLButtonElement>('#expand-fluid')!;
+  const close = document.querySelector<HTMLButtonElement>('#close-fluid')!;
+  let previousOverflow = '';
+  open.hidden = false;
+  open.addEventListener('click', () => {
+    inline.style.height = `${inline.getBoundingClientRect().height}px`;
+    previousOverflow = document.documentElement.style.overflow;
+    dialog.showModal();
+    expanded.append(lab);
+    document.documentElement.style.overflow = 'hidden';
+    close.focus();
+  });
+  close.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => {
+    inline.append(lab);
+    inline.style.height = '';
+    document.documentElement.style.overflow = previousOverflow;
+    open.focus({ preventScroll: true });
+  });
+  let backdropPress = false;
+  const outside = (e: PointerEvent | MouseEvent) => {
+    const r = dialog.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  };
+  dialog.addEventListener('pointerdown', e => { backdropPress = e.target === dialog && outside(e); });
+  dialog.addEventListener('click', e => { if (backdropPress && e.target === dialog && outside(e)) dialog.close(); backdropPress = false; });
+</script>
+<style>
+  .fluid-experience :global(.fluid-title h2){margin:0;font-size:21px;letter-spacing:0}
+  .fluid-experience{margin-block:30px}.experiment-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}.experiment-heading p:not(.eyebrow){font-size:13px;color:var(--muted);margin-top:6px}.experiment-heading button{white-space:nowrap;background:#f6f8f1;color:var(--accent)}dialog{width:min(1160px,calc(100% - 48px));max-height:92dvh;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);overscroll-behavior:contain;box-shadow:0 24px 100px #15241d40}dialog::backdrop{background:#18241fd1;backdrop-filter:blur(5px)}.dialog-heading{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:20px;background:var(--bg);padding:18px 24px;border-bottom:1px solid var(--line)}.dialog-heading h2{font-size:20px;margin:3px 0 0;letter-spacing:0}.dialog-heading button{background:transparent;color:var(--text)}#fluid-expanded{padding:20px}#fluid-expanded :global(.lbm-lab){box-shadow:none}
+  @media(min-width:900px){#fluid-expanded :global(.lbm-lab){display:grid;grid-template-columns:minmax(0,1fr) 285px;align-items:start;column-gap:18px;grid-template-rows:auto auto auto repeat(5,max-content) 1fr auto}#fluid-expanded :global(.lbm-lab>*){grid-column:2}#fluid-expanded :global(.lab-top),#fluid-expanded :global(.example-tabs),#fluid-expanded :global(.fluid-title),#fluid-expanded :global(.lbm-explanation){grid-column:1 / -1}#fluid-expanded :global(.lbm-lab #scene){grid-column:1;grid-row:4 / 10;align-self:start}#fluid-expanded :global(.lbm-lab #scene[data-kind=cavity]){width:min(100%,calc(100dvh - 370px));margin-bottom:20px}#fluid-expanded :global(.lbm-lab #scene[data-kind=cylinder]){max-height:calc(100dvh - 370px)}#fluid-expanded :global(.fluid-readout),#fluid-expanded :global(.fluid-status){flex-wrap:wrap}#fluid-expanded :global(.scene-controls){flex-wrap:wrap}#fluid-expanded :global(.lbm-inputs){gap:15px}#fluid-expanded :global(.lbm-explanation){border-top:1px solid var(--line)}}
+  @media(max-width:720px){.experiment-heading{align-items:start;gap:12px}.experiment-heading button{padding:10px 12px;font-size:11px}.experiment-heading p:not(.eyebrow){font-size:12px}dialog{width:calc(100% - 16px);max-height:94dvh}.dialog-heading{padding:12px}.dialog-heading h2{font-size:16px}.dialog-heading button{padding:10px 12px}#fluid-expanded{padding:8px}#fluid-expanded :global(.lbm-lab #scene[data-kind=cavity]){width:100%}}
+</style>

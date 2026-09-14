@@ -1,0 +1,41 @@
+---
+import Math from './Math.astro';
+const equations = [
+  String.raw`f_i^\star = f_i - \frac{f_i - f_i^{\mathrm{eq}}}{\tau}`,
+  String.raw`f_i(\mathbf{x} + \mathbf{c}_i, t + 1) = f_i^\star(\mathbf{x}, t)`,
+  String.raw`\rho = \sum_i f_i`,
+  String.raw`\rho\mathbf{u} = \sum_i f_i\mathbf{c}_i`,
+  String.raw`\nu = \frac{1}{3}\left(\tau - \frac{1}{2}\right)`,
+];
+---
+<div class="lab lbm-lab" aria-label="格子玻尔兹曼交互实验">
+  <div class="lab-top mono"><span><span class="status-dot"></span> THE FLUID LAB</span><span id="model-label">D2Q9 / LIVE</span></div>
+  <div class="example-tabs" role="group" aria-label="选择流动算例"><button data-example="cavity" aria-pressed="true" disabled>二维 · 方腔流</button><button data-example="cylinder" aria-pressed="false" disabled>三维 · 圆柱绕流</button></div>
+  <div class="fluid-title"><h2 id="fluid-title">顶盖驱动方腔流</h2><span id="grid-size" class="mono">64 × 64</span></div>
+  <div id="scene" data-kind="cavity" tabindex="0" role="group" aria-label="二维顶盖驱动方腔流，点击流体查看格点分布" aria-describedby="fluid-help">
+    <div id="lbm-fallback" class="fluid-fallback"><svg id="fallback-diagram" viewBox="0 0 320 320" role="img" aria-label="上盖向右运动，其余三壁静止的方腔边界示意"><path d="M 30 40 V 290 H 290 V 40" fill="none" stroke="#6d8c85" stroke-width="3"/><path d="M 30 35 H 290 M 278 28 L 290 35 L 278 42" fill="none" stroke="#b7f77a" stroke-width="3"/><text x="105" y="25" fill="#b7f77a" font-size="12">MOVING LID →</text><text x="92" y="170" fill="#8caf9a" font-size="13">LID-DRIVEN CAVITY</text></svg><p id="fallback-caption">静态边界示意 · 启用 JavaScript 体验模拟</p></div>
+  </div>
+  <div class="fluid-readout"><span id="field-legend">流速 |u|　暗 0 → 亮 0.10</span><span class="mono">t = <span id="step-count">0</span> Δt</span></div>
+  <p id="boundary-note" class="boundary-note">封闭方腔 · 上盖 U → · 三壁无滑移</p>
+  <p id="fluid-help" class="fluid-help">上盖向右运动，其余三壁静止 · 点击格点探查分布</p>
+  <div class="lbm-inputs">
+    <label for="flow-speed"><span id="speed-label">顶盖速度 U</span><output id="speed-value">0.070</output><input id="flow-speed" type="range" min="0.035" max="0.085" step="0.005" value="0.07" disabled /></label>
+    <label for="viscosity">运动黏度 ν <output id="viscosity-value">0.050</output><input id="viscosity" type="range" min="0.03" max="0.09" step="0.001" value="0.05" disabled /></label>
+  </div>
+  <div class="scene-controls" aria-label="流场控制"><button data-field="speed" aria-pressed="true" disabled>流速</button><button data-field="curl" aria-pressed="false" disabled>涡量</button><button id="pause" aria-pressed="false" disabled>暂停模拟</button><button id="step" disabled>单步 ＋1</button><button id="reset" disabled>重置 ↺</button><button id="view-reset" hidden disabled>视角复位</button></div>
+  <div class="fluid-status"><span class="mono">Re ≈ <b id="re-value">87</b> · τ = <b id="tau-value">0.650</b></span><span id="scene-status" aria-live="polite">格子单位 · 调参后重新初始化</span></div>
+  <details class="lbm-explanation"><summary>流动是怎样算出来的？ <span>＋</span></summary>
+    <p id="model-note">二维 D2Q9：上盖向右运动，带动封闭方腔内的主涡；Re 以腔体边长计算。初始流体静止。</p>
+    <div class="lbm-principle"><div id="populations" class="d2q9" data-dim="cavity" aria-label="格点的离散方向分布"></div><div><strong id="probe-location">格点（32，32）</strong><div id="probe-macro" class="mono">ρ · u</div><p id="population-note">每格保存九个方向的分布 fᵢ，中心 f₀ 为静止分布。</p></div></div>
+    <ol><li>碰撞：分布向局部平衡态松弛，守恒质量与动量。</li><li id="collision-note">迁移：分布移动到相邻格点。静止壁反弹，上盖通过移动壁修正注入水平动量。</li><li>涌现：求和得到密度与速度，示踪粒子沿速度场留下运动轨迹。</li></ol>
+    <div class="lbm-equations" aria-label="碰撞、迁移及宏观量公式">{equations.map(tex => <Math tex={tex} display />)}</div>
+    <p class="lbm-note">亮点是示踪粒子，不是逐个求解的分子。两个算例均为低马赫数 BGK 教学模型，参数使用格子单位。颜色超出图例范围时饱和。<a href="https://arxiv.org/abs/comp-gas/9611001">了解反弹边界 ↗</a></p>
+  </details>
+</div>
+
+<style>
+  .lbm-equations { font-size: 12px; line-height: 1.5; min-width: 0; }
+  .lbm-equations :global(.math-display) { display: block; overflow-x: auto; padding-block: 2px; }
+  .lbm-equations :global(.katex-display) { margin: 0.8em 0; }
+  .lbm-equations :global(.katex-display > .katex) { white-space: nowrap; }
+</style>

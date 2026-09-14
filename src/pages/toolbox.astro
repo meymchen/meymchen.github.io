@@ -1,0 +1,7 @@
+---
+import Layout from '../layouts/Layout.astro';
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<Layout title="工具箱 · Yuming Chen" description="日常使用的工具、配置与使用心得。">
+  <div class="content-page wrap"><section class="page-hero"><p class="eyebrow">TOOLBOX / 工具箱</p><h1>平时用什么，<br /><span class="accent">为什么这样用。</span></h1><p>记录日常使用的工具、配置和使用心得。</p></section><section class="quiet-empty"><h2>清单还在整理。</h2><p>第一批工具和使用记录会放在这里。</p><div class="inline-links"><a href={`${home}projects/#personal`}>先看看我自己做的工具</a><a href={`${home}blog/`}>阅读已有的工程笔记</a></div></section></div>
+</Layout>

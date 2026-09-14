@@ -1,0 +1,57 @@
+import { test, expect } from '@playwright/test';
+
+test('expanded experiment preserves simulation and returns focus on close', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./#simulation');
+  await expect(page.locator('.hero .lbm-lab')).toHaveCount(0);
+  const scene = page.locator('#scene');
+  await scene.scrollIntoViewIfNeeded();
+  await expect(scene).toHaveAttribute('data-rendered', 'true');
+  await page.locator('#step').click();
+  await expect(scene).toHaveAttribute('data-steps', '1');
+  const inlineWidth = (await scene.boundingBox())!.width;
+  const canvas = await scene.locator('canvas').elementHandle();
+  await page.getByRole('button', { name: '放大实验' }).click();
+  const dialog = page.getByRole('dialog', { name: '计算流体力学实验' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('#scene')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: '关闭放大实验' })).toBeFocused();
+  expect((await scene.boundingBox())!.width).toBeGreaterThan(inlineWidth + 100);
+  await expect(scene).toHaveAttribute('data-steps', '1');
+  expect(await canvas!.evaluate(el => el === document.querySelector('#scene canvas'))).toBeTruthy();
+  await page.locator('#step').click();
+  await expect(scene).toHaveAttribute('data-steps', '2');
+  await page.screenshot({ path: 'test-results/fluid-modal.png' });
+  await page.getByRole('button', { name: '三维 · 圆柱绕流' }).click();
+  await expect(scene).toHaveAttribute('data-kind', 'cylinder');
+  await expect(scene).toHaveAttribute('data-rendered', 'true');
+  await page.locator('#step').click();
+  await expect(scene).toHaveAttribute('data-steps', '1');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator('#expand-fluid')).toBeFocused();
+  await expect(page.locator('#fluid-inline #scene')).toHaveAttribute('data-kind', 'cylinder');
+  await expect(scene).toHaveAttribute('data-steps', '1');
+  await page.locator('#expand-fluid').click();
+  await page.mouse.click(2, 2);
+  await expect(dialog).not.toBeVisible();
+  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe('');
+});
+
+test('mobile modal fits the viewport and controls remain usable', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./#simulation');
+  await page.locator('#scene').scrollIntoViewIfNeeded();
+  await expect(page.locator('#scene')).toHaveAttribute('data-rendered', 'true');
+  await page.locator('#expand-fluid').click();
+  const dialog = page.locator('#fluid-dialog');
+  expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBeTruthy();
+  await page.locator('#step').click();
+  await expect(page.locator('#scene')).toHaveAttribute('data-steps', '1');
+  await page.screenshot({ path: 'test-results/fluid-modal-mobile.png' });
+  await page.locator('#close-fluid').click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator('#expand-fluid')).toBeFocused();
+});

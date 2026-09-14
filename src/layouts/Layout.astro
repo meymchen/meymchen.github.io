@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+import '../styles/journal.css';
+import '../styles/navigation.css';
+interface Props { title?: string; description?: string }
+const { title = 'Yuming Chen · 算法与系统工程', description = 'yc／meymchen 的工程实践与笔记。9 年以上研发经验，记录模型训练、开发工具与后端系统的实现、故障定位和产品取舍。' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const home = base.endsWith('/') ? base : `${base}/`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const pagePath = Astro.url.pathname.slice(home.length).replace(/\/$/, '');
+const active = pagePath === '' ? '' : /^(projects|resume|research|sources)(\/|$)/.test(pagePath) ? 'projects' : pagePath.split('/')[0];
+const navigation = [
+  { path: '', label: '足迹' }, { path: 'projects', label: '项目' },
+  { path: 'blog', label: '笔记' }, { path: 'now', label: 'Now' },
+  { path: 'lab', label: 'Lab' }, { path: 'toolbox', label: '工具箱' },
+];
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} /><meta name="theme-color" content="#f8f7f3" />
+    <title>{title}</title><link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={`${home}favicon.svg`} />
+    <meta property="og:title" content={title} /><meta property="og:description" content={description} />
+    <meta property="og:type" content="website" /><meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(`${home}social.svg`, Astro.site)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">跳至正文</a>
+    <header class="header wrap">
+      <a href={home} class="brand" aria-label="Yuming Chen 首页"><span class="monogram">yc<span>_</span></span><span>YUMING CHEN</span></a>
+      <nav class="desktop-navigation" aria-label="主导航">
+        {navigation.map(item => <a href={`${home}${item.path ? `${item.path}/` : ''}`} aria-current={active === item.path ? 'page' : undefined}>{item.label}</a>)}
+        <a class="nav-contact" href={`${home}#contact`}>联系我 <span aria-hidden="true">↗</span></a>
+      </nav>
+      <details class="mobile-navigation">
+        <summary>菜单 <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="主导航">
+          {navigation.map(item => <a href={`${home}${item.path ? `${item.path}/` : ''}`} aria-current={active === item.path ? 'page' : undefined}>{item.label}</a>)}
+          <a class="nav-contact" href={`${home}#contact`}>联系我 <span aria-hidden="true">↗</span></a>
+        </nav>
+      </details>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="wrap footer"><span>© {new Date().getFullYear()} Yuming Chen</span><div class="footer-links"><a href={`${home}resume/`}>完整经历</a><a href={`${home}sources/`}>指标与参考</a><a href={`${home}#contact`}>联系我</a></div></footer>
+  </body>
+</html>
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('.mobile-navigation');
+  menu?.addEventListener('click', event => {
+    if (event.target instanceof Element && event.target.closest('a')) menu.open = false;
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    }
+  });
+</script>

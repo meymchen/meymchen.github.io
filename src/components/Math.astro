@@ -1,0 +1,16 @@
+---
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+interface Props {
+  tex: string;
+  display?: boolean;
+}
+const { tex, display = false } = Astro.props;
+const html = katex.renderToString(tex, {
+  displayMode: display,
+  output: 'htmlAndMathml',
+  throwOnError: true,
+});
+---
+<span class:list={['math', { 'math-display': display }]} set:html={html} />

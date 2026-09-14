@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+.env
+*.log
+.npm-cache/
+test-results/
+playwright-report/

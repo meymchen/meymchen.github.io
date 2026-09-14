@@ -1,0 +1,132 @@
+---
+interface Props { kind: number; label: string }
+const { kind, label } = Astro.props;
+const scenes = [
+  ['逐帧动画', '关键帧之间，一次小球弹跳。'],
+  ['第一段程序', 'Pascal 程序逐行执行，将循环结果输出到终端。'],
+  ['流体与网格', '流线绕过障碍物，观察离散网格中的流动。'],
+  ['风机与监测', '风机转动，传感信号传向监测终端。'],
+  ['对战与学习', '智能体在对战环境中行动，经验回到策略网络。'],
+  ['上下文与补全', '编辑器获取上下文，生成补全并接受代码。'],
+  ['审查与证据', '扫描代码变更，沿引用找到证据，完成查证。'],
+  ['技能与分享', '技能进入注册库，完成扫描，再分发给使用者。'],
+];
+---
+<figure class={`journey-visual visual-${kind}`} data-journey-visual data-running="false" aria-label={scenes[kind][0]}>
+  <div class="visual-heading"><span>{scenes[kind][0]}</span><button type="button" data-motion-toggle aria-label={`暂停${scenes[kind][0]}动画`} aria-pressed="false" hidden>暂停 Ⅱ</button></div>
+  <svg viewBox="0 0 640 280" role="img" aria-labelledby={`visual-title-${kind}`}>
+    <title id={`visual-title-${kind}`}>{scenes[kind][1]}</title>
+    <defs><pattern id={`grid-${kind}`} width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" class="grid-line" /></pattern></defs>
+    <rect width="640" height="280" fill={`url(#grid-${kind})`} />
+    {kind === 0 && <>
+      <text x="28" y="32" class="micro">ANIMATION / KEYFRAMES</text>
+      <path d="M62 180H578" class="axis" />
+      <path d="M92 158Q170 -30 320 158Q430 15 548 158" class="ghost-line" />
+      {[92, 206, 320, 434, 548].map((x,i) => <circle cx={x} cy={[158,73,158,102,158][i]} r="16" class="onion" />)}
+      <g class="motion bounce"><ellipse cx="0" cy="0" rx="17" ry="17" class="solid" /><path d="M-5 -6L5 0L-5 6Z" fill="white" /></g>
+      <rect x="54" y="207" width="532" height="46" rx="4" class="panel" />
+      {Array.from({length:12},(_,i) => <g><rect x={66+i*43} y="216" width="29" height="27" rx="2" class="frame-cell" /><circle cx={80+i*43} cy={230-Math.sin(i/11*Math.PI)*7} r="4" class="soft-fill" /></g>)}
+      <path d="M67 204V257" class="motion playhead" />
+    </>}
+    {kind === 1 && <>
+      <rect x="28" y="25" width="365" height="230" rx="7" class="panel" />
+      <text x="48" y="51" class="micro">HELLO.PAS</text><path d="M28 65H393" class="axis" />
+      <rect x="42" y="77" width="333" height="27" rx="3" class="motion execution-line tint" />
+      {['program Hello;', 'begin', '  for i := 1 to 3 do', "    writeln('Hello, ', i);", 'end.'].map((line,i)=><g><text x="48" y={95+i*31} class="line-number">{i+1}</text><text x="77" y={95+i*31} class="code">{line}</text></g>)}
+      <path d="M393 140H429" class="connector" /><path d="M421 134L429 140L421 146" class="connector" />
+      <rect x="430" y="77" width="182" height="142" rx="6" class="terminal" />
+      <text x="447" y="102" class="micro">OUTPUT</text>
+      {[0,1,2].map(i=><text x="448" y={132+i*27} class={`motion output-line output-${i} code`}>Hello, {i+1}</text>)}
+      <rect x="448" y="194" width="8" height="2" class="motion cursor solid" />
+    </>}
+    {kind === 2 && <>
+      <text x="28" y="32" class="micro">DISCRETE GRID / CONTINUOUS FLOW</text>
+      {[-90,-60,-30,0,30,60,90].map((offset,i)=>{
+        const y=140+offset; const bend=offset > 0 ? 1 : -1;
+        const path=`M24 ${y} C170 ${y} 210 ${140+bend*110} 308 ${140+bend*90} S450 ${y} 616 ${y}`;
+        return <g><path d={path} class="stream-bed" /><path d={path} class="motion stream" style={`--delay:${-i*.37}s`} /></g>;
+      })}
+      <circle cx="306" cy="140" r="42" class="obstacle" /><circle cx="306" cy="140" r="31" class="ghost-line" />
+      <path d="M289 140H323M306 123V157" class="axis" />
+      <text x="28" y="257" class="micro">BOUNDARY → DISCRETIZE → SOLVE</text>
+      <text x="487" y="257" class="micro">FLOW →</text>
+    </>}
+    {kind === 3 && <>
+      <text x="28" y="32" class="micro">PHYSICAL SYSTEM / ONLINE MONITORING</text>
+      <path d="M115 245H235M170 117L161 245H183L174 117" class="turbine-mast" />
+      <g class="motion rotor">
+        {[0,120,240].map(angle=><path d="M170 116L166 41Q180 33 180 50L176 111Z" transform={`rotate(${angle} 172 116)`} class="blade" />)}
+        <circle cx="172" cy="116" r="10" class="solid" />
+      </g>
+      <path d="M214 172H306V114H357" class="connector" /><circle r="5" class="motion sensor-packet solid" />
+      <rect x="358" y="63" width="246" height="160" rx="7" class="panel" /><text x="378" y="91" class="micro">SENSOR / SIGNAL</text>
+      <path d="M378 183H584M378 111V184" class="axis" />
+      <path d="M379 152L393 152L403 139L415 161L428 120L440 178L451 145L466 152L483 151L498 127L512 171L526 147L545 151L558 137L570 159L585 149" class="motion telemetry" />
+      <circle cx="582" cy="88" r="4" class="motion heartbeat solid" />
+      <text x="379" y="205" class="micro">ACQUIRE → MODEL → OBSERVE</text>
+    </>}
+    {kind === 4 && <>
+      <text x="28" y="32" class="micro">ENVIRONMENT / POLICY / EXPERIENCE</text>
+      <rect x="28" y="56" width="286" height="195" rx="7" class="panel" />
+      <rect x="47" y="76" width="248" height="151" rx="50" class="arena" /><path d="M171 76V227" class="ghost-line" /><circle cx="171" cy="151" r="35" class="ghost-line" />
+      <path d="M88 166Q170 81 250 135Q197 212 118 179" class="ghost-line" />
+      <circle r="13" class="motion agent-a solid" /><circle r="13" class="motion agent-b opponent" /><circle r="6" class="motion game-ball ball" />
+      <path d="M314 110H387M387 194H314" class="connector" /><path d="M376 104L387 110L376 116M324 188L314 194L324 200" class="connector" />
+      <text x="330" y="96" class="micro">STATE</text><text x="328" y="220" class="micro">ACTION</text>
+      <rect x="389" y="56" width="223" height="195" rx="7" class="panel" /><text x="409" y="82" class="micro">POLICY UPDATE</text>
+      {[105,151,197].map(y=>[118,183].map(z=><path d={`M428 ${y}L498 ${z}L568 151`} class="network-edge" />))}
+      {[105,151,197].map((y,i)=><circle cx="428" cy={y} r="9" class="motion neuron" style={`--delay:${i*.4}s`} />)}
+      {[118,183].map((y,i)=><circle cx="498" cy={y} r="11" class="motion neuron" style={`--delay:${i*.4+1}s`} />)}
+      <circle cx="568" cy="151" r="13" class="motion neuron" style="--delay:1.8s" />
+    </>}
+    {kind === 5 && <>
+      <rect x="28" y="25" width="395" height="230" rx="7" class="panel" /><text x="49" y="51" class="micro">EDITOR / COMPLETION</text><path d="M28 65H423" class="axis" />
+      <text x="50" y="102" class="code">def complete(context):</text><text x="50" y="136" class="code">    prompt = retrieve(context)</text>
+      <g class="motion completion"><rect x="44" y="151" width="364" height="35" rx="3" class="tint" /><text x="50" y="175" class="motion code suggestion">    return model.generate(prompt)</text></g>
+      <path d="M76 187V204" class="motion cursor connector" /><g class="motion accepted"><rect x="294" y="214" width="109" height="24" rx="12" class="tint" /><text x="309" y="231" class="micro">✓ ACCEPTED</text></g>
+      <rect x="460" y="58" width="152" height="62" rx="6" class="terminal" /><text x="479" y="84" class="micro">CONTEXT</text><path d="M480 98H544M552 98H590" class="axis" />
+      <rect x="460" y="163" width="152" height="62" rx="6" class="terminal" /><text x="479" y="199" class="micro">INFERENCE</text>
+      <path d="M423 89H460M536 120V163M460 194H423" class="connector" /><circle r="4" class="motion completion-packet solid" />
+    </>}
+    {kind === 6 && <>
+      <text x="28" y="32" class="micro">DIFF / RETRIEVAL / VERIFICATION</text>
+      <rect x="28" y="55" width="260" height="199" rx="7" class="panel" /><text x="47" y="82" class="micro">CODE CHANGE</text>
+      {[0,1,2,3,4].map(i=><g><rect x="45" y={98+i*27} width="225" height="20" rx="2" fill={i===1?'#f1e7dc':i===2?'#dde9d5':'#edf0e8'} /><text x="54" y={113+i*27} class="micro">{i===1?'−':i===2?'+':' '}</text><path d={`M77 ${108+i*27}H${[221,198,243,180,219][i]}`} class="axis" /></g>)}
+      <path d="M41 95H275" class="motion scan-beam" />
+      <path d="M288 151H351V102H392M351 151V212H392" class="connector" /><path d="M288 151H351V102H392" class="motion evidence-path" />
+      <rect x="393" y="62" width="218" height="80" rx="7" class="panel" /><text x="413" y="90" class="micro">REFERENCE</text><path d="M413 108H589M413 123H548" class="axis" />
+      <rect x="393" y="173" width="218" height="80" rx="7" class="panel" /><text x="413" y="201" class="micro">VERIFICATION</text><path d="M413 225H516" class="axis" />
+      <g class="motion verified"><circle cx="571" cy="216" r="18" class="tint" /><path d="M562 216L568 222L581 208" class="check" /></g>
+    </>}
+    {kind === 7 && <>
+      <text x="28" y="32" class="micro">REGISTER / SCAN / SHARE</text>
+      <rect x="254" y="77" width="132" height="131" rx="9" class="panel" />
+      <path d="M280 111H360M280 128H360M280 145H360" class="library-shelf" /><text x="320" y="184" text-anchor="middle" class="micro">SKILL LIBRARY</text>
+      <path d="M130 107H254M386 111H529M386 173H455V222H529" class="connector" />
+      {[{x:50,y:77,label:'PUBLISH'},{x:529,y:78,label:'CLI'},{x:529,y:190,label:'WEB'}].map(card=><g><rect x={card.x} y={card.y} width="80" height="61" rx="5" class="terminal" /><path d={`M${card.x+22} ${card.y+17}H${card.x+58}M${card.x+22} ${card.y+27}H${card.x+49}`} class="axis" /><text x={card.x+40} y={card.y+49} text-anchor="middle" class="micro">{card.label}</text></g>)}
+      <g class="motion skill-upload"><rect x="-13" y="-17" width="26" height="34" rx="3" class="skill-card" /><path d="M-6 -5H6M-6 2H3" class="axis" /></g>
+      <g class="motion skill-cli"><rect x="-13" y="-17" width="26" height="34" rx="3" class="skill-card" /><path d="M-6 0L-1 5L7 -5" class="check" /></g>
+      <g class="motion skill-web"><rect x="-13" y="-17" width="26" height="34" rx="3" class="skill-card" /><path d="M-6 0L-1 5L7 -5" class="check" /></g>
+      <g class="motion library-check"><circle cx="366" cy="90" r="15" class="solid" /><path d="M359 90L364 95L374 84" fill="none" stroke="white" stroke-width="2" /></g>
+    </>}
+  </svg>
+  <figcaption><span>{label}</span><span class="visual-note">循环示意</span></figcaption>
+</figure>
+<script>
+  import '../scripts/journey-motion';
+</script>
+<style>
+  .journey-visual{margin:30px 0;background:#f0f2eb;border:1px solid #dce2d5;border-radius:5px;overflow:hidden;color:#426445}.visual-heading{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #dce2d5;font-size:11px;letter-spacing:1px}.visual-heading button{background:none;border:1px solid #c5cebd;border-radius:3px;padding:5px 9px;color:#526849;font-size:10px;letter-spacing:0;min-height:30px}.journey-visual svg{display:block;width:100%;height:auto}.journey-visual figcaption{display:flex;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid #dce2d5;font:9px/1.7 var(--mono);color:#617258}.visual-note{white-space:nowrap}svg text{fill:#496043;font-family:var(--mono);font-size:13px}.micro{font-size:11px;letter-spacing:.7px}.code{font-size:14px}.line-number{fill:#9aa58f;font-size:11px}.grid-line{fill:none;stroke:#849976;stroke-opacity:.08}.axis{fill:none;stroke:#a9b89e;stroke-width:1.5}.ghost-line{fill:none;stroke:#b6c2ac;stroke-dasharray:4 5}.connector{fill:none;stroke:#829975;stroke-width:1.5}.solid{fill:#557847}.soft-fill{fill:#b6c7a8}.panel{fill:#fafbf7;stroke:#c6d1bc}.terminal{fill:#e8eee0;stroke:#c6d1bc}.tint{fill:#deead4}.frame-cell{fill:#f5f7ef;stroke:#c6d1bc}.onion{fill:#6d8d5510;stroke:#9bb28a;stroke-dasharray:3 4}.obstacle{fill:#dfe6d7;stroke:#839974;stroke-width:2}.stream-bed{fill:none;stroke:#b8c9a9;stroke-width:1}.stream{fill:none;stroke:#638649;stroke-width:2.4;stroke-dasharray:6 32;animation:flow 3s linear infinite;animation-delay:var(--delay)}.turbine-mast{fill:#dfe7d6;stroke:#7d936f;stroke-width:2}.blade{fill:#c6d5b8;stroke:#7d936f;stroke-width:1.5}.rotor{transform-origin:172px 116px;animation:rotate 5s linear infinite}.telemetry{fill:none;stroke:#66864e;stroke-width:2;stroke-dasharray:440;animation:signal 5s linear infinite}.sensor-packet{animation:sensor 5s linear infinite}.heartbeat{animation:pulse 2s ease-in-out infinite}.arena{fill:#edf2e6;stroke:#c2ceb6}.opponent{fill:#b49472;stroke:#967553}.ball{fill:#fafbf7;stroke:#627b53;stroke-width:2}.network-edge{stroke:#b7c8a8;fill:none}.neuron{fill:#dfebd5;stroke:#8fa97b;animation:neuron 4s ease-in-out infinite;animation-delay:var(--delay)}.agent-a{animation:agent-a 6s ease-in-out infinite}.agent-b{animation:agent-b 6s ease-in-out infinite}.game-ball{animation:ball 6s ease-in-out infinite}.bounce{animation:bounce 4s linear infinite}.playhead{stroke:#557847;stroke-width:2;animation:playhead 4s linear infinite}.execution-line{animation:execute 6s steps(1) infinite}.output-line{animation:output 6s steps(1) infinite}.output-1{animation-name:output-two}.output-2{animation-name:output-three}.cursor{animation:blink 1.2s steps(1) infinite}.completion{animation:completion 6s linear infinite}.suggestion{animation:accept-color 6s steps(1) infinite}.accepted{animation:accept 6s ease-in-out infinite}.completion-packet{animation:completion-packet 6s linear infinite}.scan-beam{stroke:#809f65;stroke-width:2;animation:scan 6s linear infinite}.evidence-path{fill:none;stroke:#597e42;stroke-width:3;stroke-dasharray:210;animation:evidence 6s linear infinite}.verified{animation:verified 6s ease-in-out infinite}.check{fill:none;stroke:#5c7e46;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.library-shelf{stroke:#9db78b;stroke-width:7;stroke-linecap:round}.skill-card{fill:#e0ebd5;stroke:#759660;stroke-width:1.5}.skill-upload{animation:upload 6s ease-in-out infinite}.skill-cli{animation:distribute-cli 6s ease-in-out infinite}.skill-web{animation:distribute-web 6s ease-in-out infinite}.library-check{animation:library-check 6s ease-in-out infinite}
+  .journey-visual .motion{animation-play-state:paused}.journey-visual[data-running=true] .motion{animation-play-state:running}
+  @keyframes bounce{0%,100%{transform:translate(92px,158px)}12.5%{transform:translate(149px,88px)}25%{transform:translate(206px,64px)}37.5%{transform:translate(263px,88px)}50%{transform:translate(320px,158px) scale(1.2,.8)}62.5%{transform:translate(377px,112px)}75%{transform:translate(434px,94px)}87.5%{transform:translate(491px,112px)}99%{transform:translate(548px,158px)}}
+  @keyframes playhead{0%{transform:translateX(0)}100%{transform:translateX(500px)}}
+  @keyframes execute{0%,100%{transform:translateY(0)}12%{transform:translateY(31px)}24%,44%,64%{transform:translateY(62px)}34%,54%,74%{transform:translateY(93px)}88%{transform:translateY(124px)}}
+  @keyframes output{0%,100%{opacity:0}34%,98%{opacity:1}}@keyframes output-two{0%,100%{opacity:0}54%,98%{opacity:1}}@keyframes output-three{0%,100%{opacity:0}74%,98%{opacity:1}}
+  @keyframes flow{to{stroke-dashoffset:-152}}@keyframes rotate{to{transform:rotate(360deg)}}@keyframes signal{0%{stroke-dashoffset:440}75%,100%{stroke-dashoffset:0}}@keyframes sensor{0%{transform:translate(214px,172px);opacity:0}10%{opacity:1}45%{transform:translate(306px,172px)}65%{transform:translate(306px,114px)}90%,100%{transform:translate(357px,114px);opacity:0}}@keyframes pulse{50%{opacity:.35}}
+  @keyframes agent-a{0%,100%{transform:translate(88px,166px)}30%{transform:translate(164px,110px)}60%{transform:translate(225px,146px)}80%{transform:translate(153px,195px)}}@keyframes agent-b{0%,100%{transform:translate(247px,136px)}30%{transform:translate(201px,181px)}60%{transform:translate(136px,149px)}80%{transform:translate(198px,105px)}}@keyframes ball{0%,100%{transform:translate(116px,164px)}30%{transform:translate(183px,120px)}60%{transform:translate(202px,163px)}80%{transform:translate(165px,178px)}}@keyframes neuron{0%,100%{fill:#dfebd5}35%{fill:#6f9255}}
+  @keyframes blink{50%{opacity:0}}@keyframes completion{0%,28%{clip-path:inset(0 100% 0 0)}65%,94%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(0 100% 0 0)}}@keyframes accept-color{0%{fill:#8b9e7d}72%,100%{fill:#426445}}@keyframes accept{0%,69%,100%{opacity:0}76%,92%{opacity:1}}@keyframes completion-packet{0%{transform:translate(423px,89px);opacity:0}3%{transform:translate(441px,89px);opacity:1}19%{transform:translate(536px,89px);opacity:1}37%{transform:translate(536px,194px);opacity:1}56%{transform:translate(423px,194px);opacity:1}60%,100%{transform:translate(423px,194px);opacity:0}}
+  @keyframes scan{0%{transform:translateY(0);opacity:0}10%{opacity:1}46%{transform:translateY(132px);opacity:1}54%,100%{transform:translateY(132px);opacity:0}}@keyframes evidence{0%,30%{stroke-dashoffset:210;opacity:0}35%{opacity:1}62%,92%{stroke-dashoffset:0;opacity:1}100%{opacity:0;stroke-dashoffset:0}}@keyframes verified{0%,60%,100%{opacity:0}70%,94%{opacity:1}}
+  @keyframes upload{0%{transform:translate(130px,107px);opacity:0}8%{opacity:1}35%{transform:translate(285px,107px);opacity:1}43%,100%{transform:translate(285px,107px);opacity:0}}@keyframes distribute-cli{0%,45%{transform:translate(388px,111px);opacity:0}52%{opacity:1}90%{transform:translate(520px,111px);opacity:1}100%{transform:translate(520px,111px);opacity:0}}@keyframes distribute-web{0%,50%{transform:translate(388px,173px);opacity:0}56%{opacity:1}70%{transform:translate(455px,173px)}80%{transform:translate(455px,221px)}95%{transform:translate(520px,221px);opacity:1}100%{transform:translate(520px,221px);opacity:0}}@keyframes library-check{0%,30%,100%{opacity:0}40%,92%{opacity:1}}
+  @media(max-width:720px){.visual-heading{padding:10px 13px}.journey-visual figcaption{padding:10px 13px;font-size:8px}.visual-note{display:none}.visual-heading button{min-height:34px}.journey-visual{margin-block:24px}}
+  @media(prefers-reduced-motion:reduce){.journey-visual .motion{animation:none!important}.bounce{transform:translate(206px,64px)}.sensor-packet{transform:translate(306px,140px)}.agent-a{transform:translate(88px,166px)}.agent-b{transform:translate(247px,136px)}.game-ball{transform:translate(171px,151px)}.skill-upload{transform:translate(174px,107px)}.skill-cli{transform:translate(458px,111px)}.skill-web{transform:translate(482px,222px)}.completion-packet{transform:translate(536px,141px)}}
+</style>

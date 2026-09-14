@@ -1,0 +1,20 @@
+---
+import Layout from './Layout.astro';
+import { projects, notes } from '../data/projects';
+const { frontmatter } = Astro.props;
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const project = projects.find(project => project.slug === frontmatter.project);
+const otherNotes = notes.filter(note => note.project !== project?.slug);
+---
+<Layout title={`${frontmatter.title} · Yuming Chen`} description={frontmatter.description}>
+  <article class="content-page wrap">
+    <nav class="breadcrumbs" aria-label="当前位置"><a href={`${home}blog/`}>笔记</a><span aria-hidden="true">／</span><span aria-current="page">{frontmatter.title}</span></nav>
+    <header class="page-hero"><p class="eyebrow">FIELD NOTES / 工程笔记</p><h1>{frontmatter.title}</h1><p>整理于 <time datetime={frontmatter.date}>{frontmatter.date}</time> · 项目复盘</p>{project && <div class="inline-links"><a href={`${home}projects/${project.slug}/`}>这篇笔记来自：{project.title}</a></div>}</header>
+    <div class="article-body"><slot /></div>
+    <div class="post-reading continue-reading">
+      {project && <><h2>回到这段经历</h2><div class="reading-links"><a href={`${home}projects/${project.slug}/`}><span>项目背景与完整记录</span><strong>{project.title} →</strong></a><a href={`${home}#${project.chapter}`}><span>工程足迹</span><strong>{project.chapterLabel} →</strong></a></div></>}
+      <div class="inline-links"><a href={`${home}blog/`}>返回全部笔记</a></div>
+      <h2>其他笔记</h2><div class="reading-links">{otherNotes.map(note => <a href={`${home}blog/${note.slug}/`}><strong>{note.title} →</strong></a>)}</div>
+    </div>
+  </article>
+</Layout>

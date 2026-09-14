@@ -1,0 +1,8 @@
+---
+import Layout from '../../layouts/Layout.astro';
+const posts = Object.values(import.meta.glob<{ frontmatter: { title: string; description: string; date: string; draft?: boolean }; url: string }>('./*.md', { eager: true })).filter(p => !p.frontmatter.draft).sort((a,b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<Layout title="工程笔记 · Yuming Chen"><div class="content-page wrap"><section class="page-hero"><p class="eyebrow">FIELD NOTES / 工程笔记</p><h1>构建之余，<br /><span class="accent">把思考写下来。</span></h1><p>从做过的项目里整理问题、证据和判断。这里写排障，也写算法目标与实际需求之间的偏差。</p><div class="inline-links"><a href={`${home}projects/`}>先了解项目背景</a><a href={`${home}#work`}>沿足迹认识我</a></div></section>
+{posts.length ? <div class="blog-list">{posts.map(post => <a class="blog-entry" href={post.url}><p class="eyebrow">{new Date(post.frontmatter.date).toISOString().slice(0,10)}</p><h2>{post.frontmatter.title} ↗</h2><p>{post.frontmatter.description}</p></a>)}</div> : <section class="empty-blog"><span class="empty-number mono">00</span><div><h2>第一篇，留给值得写的事。</h2><p>目前还没有公开文章。先看看我正在构建的系统。</p><a class="text-link" href={`${home}#work`}>探索工程项目 ↗</a></div></section>}
+</div></Layout>

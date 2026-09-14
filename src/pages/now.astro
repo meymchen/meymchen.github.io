@@ -1,0 +1,13 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { activities, nowUpdated, nowSummary } from '../data/now';
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<Layout title="Now · Yuming Chen" description={nowSummary}>
+  <div class="content-page wrap">
+    <section class="page-hero"><p class="eyebrow">NOW / 近况</p><h1>最近，<br /><span class="accent">时间花在这些事上。</span></h1><p>继续做自己的工具，也留些时间动手尝试。</p><p class="updated">更新于 <time datetime={nowUpdated}>{nowUpdated.replaceAll('-', '／')}</time></p></section>
+    <div class="reading-width now-list">{activities.map(activity => <section class="now-entry" id={activity.id}><h2>{activity.title}</h2><div><p>{activity.text}</p>{activity.link && <div class="inline-links"><a href={`${home}${activity.link}`}>{activity.label} →</a></div>}</div></section>)}
+      <div class="continue-reading"><h2>之前的路，以及下一次交流</h2><div class="inline-links"><a href={`${home}#work`}>回到工程足迹</a><a href={`${home}lab/`}>试试流体实验</a><a href={`${home}#contact`}>联系我</a></div></div>
+    </div>
+  </div>
+</Layout>

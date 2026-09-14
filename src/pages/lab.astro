@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FluidExperience from '../components/FluidExperience.astro';
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<Layout title="Lab · 流体实验 · Yuming Chen" description="调整参数，观察二维方腔流和三维圆柱绕流，了解离散计算与边界条件。">
+  <div class="content-page lab-page wrap"><section class="page-hero"><p class="eyebrow">LAB / 实验室</p><h1>调一调，<span class="accent">看流动怎样变化。</span></h1><p>从大学时的计算流体力学兴趣出发，做一个可以亲手试的实验。切换二维方腔与三维圆柱，观察参数和边界条件怎样影响流场。</p></section><FluidExperience />
+    <section class="continue-reading lab-context"><h2>实验背后的经历</h2><p class="muted">这是格子玻尔兹曼方法的教学算例，未作工程尺度标定。它与研究项目中的方法和验证条件分别说明。</p><div class="inline-links"><a href={`${home}#simulation`}>回到大学的计算流体力学足迹</a><a href={`${home}projects/research/`}>阅读流体仿真与工业监测项目</a><a href={`${home}now/#lbm-rust`}>看看最近在做什么</a></div></section>
+  </div>
+</Layout>

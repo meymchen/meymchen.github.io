@@ -1,0 +1,33 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ResearchNotes from '../../components/ResearchNotes.astro';
+import { projects, notes, projectGroups, type Project } from '../../data/projects';
+export function getStaticPaths() {
+  return projects.map(project => ({ params: { slug: project.slug }, props: { project } }));
+}
+interface Props { project: Project }
+const { project } = Astro.props;
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const note = notes.find(note => note.slug === project.note);
+const related = projects.filter(item => item.chapter === project.chapter && item.slug !== project.slug);
+const group = projectGroups.find(group => group.id === project.group)!;
+---
+<Layout title={`${project.title} · 项目 · Yuming Chen`} description={project.summary}>
+  <div class="content-page wrap">
+    <nav class="breadcrumbs" aria-label="当前位置"><a href={`${home}projects/`}>项目</a><span aria-hidden="true">／</span><a href={`${home}projects/#${group.id}`}>{group.title}</a><span aria-hidden="true">／</span><span aria-current="page">{project.title}</span></nav>
+    <header class="page-hero"><p class="eyebrow">{project.record.meta}</p><h1>{project.title}</h1><p>{project.summary}</p><div class="tags">{project.tags.map(tag => <span>{tag}</span>)}</div><div class="inline-links"><a href={`${home}#${project.chapter}`}>回到足迹：{project.chapterLabel}</a></div></header>
+    <div class="reading-width">
+      <section class="project-details" aria-label="项目记录"><p class="role">{project.record.subtitle}</p>{project.slug === 'research' ? <ResearchNotes /> : <ul>{project.record.bullets.map(bullet => <li>{bullet}</li>)}</ul>}
+        {project.record.links && <div class="inline-links">{project.record.links.map(link => <a href={link.url}>{link.label} ↗</a>)}</div>}
+        {project.source && <div class="inline-links"><a href={`${home}sources/#${project.source}`}>查看指标口径与参考</a></div>}
+      </section>
+      <section class="continue-reading" aria-labelledby="continue-heading"><h2 id="continue-heading">沿着这个项目继续看</h2><div class="reading-links">
+        {note && <a href={`${home}blog/${note.slug}/`}><span>相关笔记</span><strong>{note.title} →</strong></a>}
+        {project.slug === 'research' && <a href={`${home}lab/`}><span>动手试试</span><strong>在流体实验中观察边界与流动 →</strong></a>}
+        {project.group === 'personal' && <a href={`${home}now/#${project.slug}`}><span>近况</span><strong>现在正在做的 {project.slug === 'banshu' ? 'Banshu' : 'lspf'} →</strong></a>}
+        {related.map(item => <a href={`${home}projects/${item.slug}/`}><span>同一段经历中的项目</span><strong>{item.title} →</strong></a>)}
+        <a href={`${home}#${project.chapter}`}><span>回到工程足迹</span><strong>{project.chapterLabel} →</strong></a>
+      </div><div class="inline-links"><a href={`${home}projects/#${project.group}`}>返回{group.title}</a></div></section>
+    </div>
+  </div>
+</Layout>

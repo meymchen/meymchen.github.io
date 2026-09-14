@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { projects, projectGroups } from '../../data/projects';
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+---
+<Layout title="项目 · Yuming Chen" description="做过的项目与继续投入的开源工具，从流体仿真、游戏智能体到开发者工具。">
+  <div class="content-page wrap">
+    <section class="page-hero"><p class="eyebrow">PROJECTS / 项目</p><h1>沿着问题，<br /><span class="accent">做过这些东西。</span></h1><p>有些已经交付，有些仍在继续。这里记录我负责的部分、实现过程，以及使用之后得到的反馈。</p><div class="inline-links"><a href={`${home}#work`}>沿足迹看这些项目</a><a href={`${home}now/`}>看看我现在在做什么</a></div></section>
+    <nav class="section-index" aria-label="项目分类">{projectGroups.map(group => <a href={`#${group.id}`}>{group.title}</a>)}</nav>
+    {projectGroups.map(group => <section class="project-group" id={group.id} aria-labelledby={`heading-${group.id}`}>
+      <div class="group-heading"><h2 id={`heading-${group.id}`}>{group.title}</h2><p>{group.description}</p></div>
+      <div class="project-cards">{projects.filter(project => project.group === group.id).map(project => <article class="project-card"><p class="card-meta mono">{project.record.meta}</p><h3><a href={`${home}projects/${project.slug}/`}>{project.title}</a></h3><p>{project.summary}</p><div class="tags">{project.tags.map(tag => <span>{tag}</span>)}</div><a class="text-link" href={`${home}projects/${project.slug}/`}>了解项目 <span aria-hidden="true">→</span></a></article>)}</div>
+    </section>)}
+    <div class="inline-links"><a href={`${home}resume/`}>查看完整经历与协作记录</a></div>
+  </div>
+</Layout>

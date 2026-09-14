@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FluidExperience from '../components/FluidExperience.astro';
+import JourneyVisual from '../components/JourneyVisual.astro';
+import { projects } from '../data/projects';
+import { nowSummary } from '../data/now';
+const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const chapters = [
+  { id: 'first-frame', year: '14 岁', label: '让画面动起来', category: 'CURIOSITY / FLASH', title: '一切从一帧动画开始。', text: '14 岁，第一次接触 Flash，试着制作动画。那时的兴趣很直接：把脑海里的画面做出来，让它在屏幕上动起来。', lesson: '先做出一个可以看见、可以修改的东西。', tags: ['Flash', '动画'], trace: 'FRAME 01 → FRAME 02 → FRAME 03' },
+  { id: 'first-code', year: '16 岁', label: '写下第一行代码', category: 'LOGIC / PASCAL', title: '从安排画面，到描述规则。', text: '高中时，用 Pascal 写下第一行代码。创作开始有了另一种方式：把想法拆成步骤，用程序表达，再观察它是否按预期运行。', lesson: '把一个模糊的想法，拆成可以执行的步骤。', tags: ['Pascal', '编程起点'], trace: 'begin → imagine → build → end.' },
+  { id: 'simulation', year: '大学', label: '用计算理解流动', category: 'MODELING / 2012 — 2016', title: '让代码走进物理世界。', text: '大学学习理论与应用力学，用 C 和 Fortran 做计算流体力学。开始面对另一类问题：怎样把连续的物理过程变成离散计算，以及如何理解数值结果与现实之间的差距。', lesson: '建模之外，还要关心边界条件、误差和验证。', tags: ['C', 'Fortran', '计算流体力学'], detail: '2015 年 9 月至 2016 年 5 月，兼职协助导师开展仿生力学实验研究与仿真模拟。学习如何让实验与计算相互检验，而不只关注程序是否运行。', trace: 'PHYSICAL MODEL → DISCRETIZE → SOLVE' },
+  { id: 'real-world', year: '2016', label: '面对真实工程问题', category: 'APPLIED RESEARCH / 2016 — 2021', title: '模型需要经得起实验。', text: '工作的第二年（2017 年），开始用 Python 做机器学习与深度学习，解决实际工程问题。参与风力机样机研发、仿真与风洞测试，构建工业设备在线监测模型；也开始用 JavaScript 写网站和微信小程序。', lesson: '把仿真、实验与设备数据放在一起看，再决定下一步。', tags: ['Python', '机器学习', 'JavaScript', '设备监测'], detail: '用 SST-DDES 研究垂直轴风轮，检查计算域、网格与时间步长的无关性；独立完成齿轮箱磨损分类的数据处理、建模、实验及论文工作，并独立设计、训练和评测风光功率预测模型。2018 年起参与新能源创业，主导物联网平台和微信小程序开发，把设备数据接到使用者面前。', trace: 'SIMULATION ⇄ EXPERIMENT ⇄ DATA' },
+  { id: 'systems', year: '2021', label: '从算法到系统', category: 'GAME ALGORITHMS / SYSTEMS', title: '算法之外，还有整个系统。', text: '2021 年起，更关注系统工程问题，并接触 Rust。基于 SEED RL 搭建分布式训练系统，解决跨机器梯度聚合与数据广播问题。体育竞技游戏智能体上线前依据 Elo、TrueSkill 提供 25 档难度，由运营人员调整使用。', lesson: '一次实验之外，还要考虑数据怎样产生，任务怎样运行，结果怎样比较。', tags: ['强化学习', '分布式训练', 'Rust', 'Elo / TrueSkill'], detail: '搭建网页训练与分析平台，支持启动训练、监控状态和调整算法。另用强化学习与遗传算法分析 SLG 数值平衡，但系统侧重优化已有组合，未能直接帮助策划设计新资料，使用约一年后终止。这让我开始更认真地区分算法目标与用户的主要工作。', trace: 'ENVIRONMENT ⇄ POLICY ⇄ EVALUATION' },
+  { id: 'coding', year: '2023', label: '从零构建编程工具', category: 'DEVELOPER TOOLS / 2023 — 2026', title: '把模型接进每天的工作。', text: '从零构建 AI 编程工具，覆盖推理服务、上下文引擎、语言服务器、聊天界面、IDE 插件和数据遥测。独立完成首版全部组件并上线。平台运营后扩充研发团队，离任时共 12 人，并承担技术负责与维护交接。', lesson: '用户体验取决于整条链路：上下文、推理延迟、编辑器交互与反馈。', tags: ['模型推理', 'LSP', 'GPTQ', '可观测性'], detail: '2023 年 10 月上线，日服务 700 多名程序员，日均请求超过 20 万次，代码采纳率为 16％～20％。以 RTX 3090／4090 运行 7B 级及以下代码模型，键盘输入至补全文本显示的端到端延迟 P99 约 490 ms。一次随运行时间增长的延迟，最终通过遥测定位到请求依赖注入中的数据库写入。', trace: 'CONTEXT → INFERENCE → EDITOR → FEEDBACK' },
+  { id: 'review', year: '2025', label: '让审查有据可查', category: 'CODE INTELLIGENCE / 2025 — 2026', title: '给判断找到依据。', text: '独立完成面向 SVN 与大型遗留代码库的代码审查流水线首版并上线，把质量分析、代码图谱、语义检索与运行时查证接入审查过程，并对比不同方案的查证率、耗时与成本。', lesson: '把质量、延迟和成本放进同一次评测，才能讨论工程取舍。', tags: ['代码图谱', '语义检索', '评测', '流水线'], detail: '内部对照评测中，在保持查证率的条件下，token 消耗约为 Agent 方案的六分之一，执行时间约为十分之一。2026 年 2 月起常态运营，平均每晚处理 5 千多次请求。用户采纳率约 9％；已收到的反馈中，正确反馈占比约 76％，两者回答的是不同问题。', trace: 'CHANGE → RETRIEVE → VERIFY → REVIEW' },
+  { id: 'sharing', year: '2026', label: '把经验变成公共能力', category: 'PLATFORM ENGINEERING / 2026', title: '让好用的方法被更多人用到。', text: '独立开发内部智能体技能分享平台首版并上线，提供注册、版本管理、检索、扫描、分发与实验能力，交付 CLI、Web 和 API。处理 OAuth、跨网络权限与链接分享，并完成运营维护交接。', lesson: '交付也包括权限、使用反馈，以及接手的人能否继续维护。', tags: ['后端服务', 'PostgreSQL / pgvector', '对象存储', '权限'], detail: '2026 年 6 月上线，平台内公开技能超过 200 项，累计分发超过 2 千次，完成向 4 名工程师的运营维护交接。持续以 Rust 开发 lspf 和 banshu-ai，把协议生命周期、取消、重试与资源边界写进可复用的工具。', trace: 'REGISTER → DISCOVER → REUSE' },
+];
+---
+<Layout>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="status-dot"></span> YUMING CHEN / ENGINEERING JOURNAL</p>
+      <h1>把问题想清楚，<br />把系统<span class="accent">做完整。</span></h1>
+      <p class="hero-description">9 年以上研发经验，做过流体仿真、游戏智能体与 AI 开发工具。<br />我关心模型如何接进工作流程，也关心系统变慢时怎么定位、建议如何验证，以及做出的功能是否有人用。</p>
+      <div class="hero-actions"><a class="button primary" href="#work">沿时间轴探索 <span>↓</span></a><a class="text-link" href={`${home}projects/`}>查看项目 ↗</a></div>
+      <p class="hero-location mono">GUANGZHOU <span class="divider">/</span> ALGORITHMS & BACKEND SYSTEMS</p>
+    </div>
+  </section>
+  <div class="chapter-intro wrap"><p class="eyebrow">THE THREAD THROUGH IT ALL</p><p>沿着做过的项目，谈实现、验证，也谈没有奏效的选择。</p><span class="mono">01 — 08 ↓</span></div>
+  <section id="work" class="journey wrap" aria-label="工程成长时间线">
+    <aside class="journey-rail"><div class="rail-inner"><p class="eyebrow">工程足迹</p><nav aria-label="时间线导航"><ol>{chapters.map((c, i) => <li><a href={`#${c.id}`} data-chapter-link={c.id} aria-current={i === 0 ? 'step' : undefined}><span class="rail-dot"></span><span class="rail-year">{c.year}</span><span class="rail-label">{c.label}</span></a></li>)}</ol></nav><p class="rail-note">滚动阅读，或选择一个时刻。<br />每一步，都来自一个新问题。</p></div></aside>
+    <div class="journey-chapters">{chapters.map((c, i) => <article id={c.id} class="chapter" data-chapter><div class="chapter-meta"><span class="eyebrow">{c.category}</span><span class="mono">{String(i + 1).padStart(2, '0')} / 08</span></div><h2>{c.title}</h2><p class="chapter-text">{c.text}</p>{c.id === 'simulation' ? <FluidExperience /> : <JourneyVisual kind={i} label={c.trace} />}<p class="chapter-lesson"><span>带到下一程的经验</span>{c.lesson}</p><div class="tags">{c.tags.map(t => <span>{t}</span>)}</div>{c.detail && <details><summary>展开项目细节 <span>＋</span></summary><p>{c.detail}</p></details>}<div class="chapter-links">{projects.filter(project => project.chapter === c.id).map(project => <a href={`${home}projects/${project.slug}/`}>{project.title} →</a>)}{c.id === 'simulation' && <><a href={`${home}lab/`}>进入流体实验室 →</a><a href={`${home}projects/research/`}>后来的研究项目 →</a></>}</div></article>)}</div>
+  </section>
+  <section class="section wrap" id="opensource"><div class="section-heading"><div><p class="eyebrow">STILL BUILDING</p><h2>把经验写进自己的工具。</h2></div><a class="text-link" href="https://github.com/meymchen">GitHub ↗</a></div><div class="repo-grid"><a class="repo" href={`${home}projects/lspf/`}><div class="repo-top"><span class="mono">RUST / LANGUAGE INFRASTRUCTURE</span><span>↗</span></div><h3>lspf<span>_</span></h3><p>管理协议生命周期、请求取消、并发容量与统一关闭。用真实子进程测试异常退出、超时和资源释放，把容易遗漏的边界放进框架。</p><div class="repo-bottom"><span>语言工具基础设施</span><span>了解项目 →</span></div></a><a class="repo" href={`${home}projects/banshu/`}><div class="repo-top"><span class="mono">RUST / LLM SDK</span><span>↗</span></div><h3>banshu-ai<span>_</span></h3><p>已发布的 LLM SDK：统一文本、推理与工具调用的流式事件，处理错误终态、有限重试和取消。Banshu 的 Agent core 仍在设计阶段。</p><div class="repo-bottom"><span>SDK 已发布，Agent 设计中</span><span>查看项目 ↗</span></div></a></div></section>
+  <section class="research-band" id="research"><div class="section wrap research-grid"><div><p class="eyebrow">RESEARCH ROOTS</p><h2>有些方法，<br />一直带在身上。</h2></div><div class="research-summary"><p>做仿真时关注边界条件，做实验时寻找验证依据。后来训练智能体、优化推理服务，依然要回答相似的问题：模型遗漏了什么，结果能否复现，在真实环境中是否成立。</p><p>在风轮仿真中检查网格与时间步长，在有限的设备样本上比较分类模型，再把监测和预测接进软件。这些经历让我逐渐学会，同时考虑算法依据、数据条件和使用方式。</p><a class="text-link" href={`${home}projects/research/`}>阅读研究项目 ↗</a><a class="text-link research-source" href={`${home}sources/#research`}>指标与参考 ↗</a></div></div></section>
+  <section class="blog-callout wrap"><div><p class="eyebrow">FIELD NOTES</p><h2>代码之外，留下思考。</h2><p>一次补全延迟排查，一个没有对准需求的系统，以及审查指标背后的分母。</p></div><a class="button" href={`${home}blog/`}>阅读工程笔记 <span>↗</span></a></section>
+  <section class="home-next wrap"><p class="eyebrow">NOW / 近况</p><h2>足迹之外，还在继续。</h2><p>{nowSummary}</p><div class="inline-links"><a href={`${home}now/`}>看看近况 →</a><a href={`${home}lab/`}>动手试试 Lab →</a><a href={`${home}toolbox/`}>打开工具箱 →</a></div></section>
+  <section id="contact" class="contact wrap"><p class="eyebrow">THE NEXT CHAPTER</p><h2>下一个问题，<span class="accent">一起解决。</span></h2><p class="muted">欢迎交流模型服务、开发工具与后端系统，也欢迎讨论难以定位的问题和不容易做的取舍。</p><div class="hero-actions"><a class="button primary" href="mailto:meymchen@qq.com">发邮件给我 <span>↗</span></a><span class="contact-email">meymchen@qq.com</span></div><div class="contact-links"><a href="https://github.com/meymchen">GitHub ↗</a><a href={`${home}blog/`}>工程笔记 ↗</a></div></section>
+</Layout>
+<script>
+  import '../scripts/journey';
+</script>
